@@ -32,12 +32,11 @@ enum TokenKind {
   SubEq, // '-='
   MulEq, // '*='
   DivEq, // '/='
-  // *(Maybe Remove) AndEq, // '&='
-  // *(Maybe Remove) OrEq, // '|='
+  // *(Maybe Add) AndEq, // '&='
+  // *(Maybe Add) OrEq, // '|='
   
 
   /* - Features - */ // TODO(ghostway): find better name for this comment
-  //At, // TODO(ghostway): check what is the At thing (maybe '[' (Bracket)?)
   Dot, // '.' (Period, Full-Stop)
   DotDot, // '..' (Like python's Range)
   Comma, // ','
@@ -84,5 +83,6 @@ enum TokenKind {
   WhiteSpace,
   Ident,
 
-  Null
+  Null,
+  Fail
 };
