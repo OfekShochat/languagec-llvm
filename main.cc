@@ -1,29 +1,17 @@
 #include "lexer.h"
 #include "TokenKinds.h"
 #include <iostream>
-
-std::map<std::string, TokenKind> TokenMap{
-  {"while", TokenKind::While},
-  {"as", TokenKind::As},
-  {"break", TokenKind::Break},
-  {"continue", TokenKind::Continue},
-  {"if", TokenKind::If},
-  {"else", TokenKind::Else},
-  {"true", TokenKind::True},
-  {"false", TokenKind::False},
-  {"func", TokenKind::Func},
-  {"for", TokenKind::For},
-  {"in", TokenKind::In},
-  {"switch", TokenKind::Switch},
-  {"const", TokenKind::Const},
-  {"return", TokenKind::Return}
-};
+#include <chrono>
 
 int main() {
-  Tokenizer lexer(std::string("i32 pooop1()"));
+  auto start = std::chrono::high_resolution_clock::now();
+  Tokenizer lexer(std::string("func main() { return 1.2; }"));
   auto o = lexer.Start();
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
   for (auto const& i : o) {
     std::cout << i.kind << " " << i.Length << std::endl;
   }
+  std::cout << static_cast<float>(duration)/1000000000 << std::endl;
   return 0;
 }
