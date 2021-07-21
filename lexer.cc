@@ -1,7 +1,5 @@
 #include "lexer.h"
 #include <array>
-#include <ctype.h>
-#include <exception>
 #include <string>
 #include <iostream>
 #include <list>
@@ -70,11 +68,14 @@ bool Tokenizer::IdContinue() {
 }
 
 TokenKind Tokenizer::Number() {
-  int old = index;
+  auto kind = IntLiteral;
   do {
     index++;
-  } while (isdigit(input_[index]) || input_[index] == '_');
-  return IntLiteral; // TODO: change this
+    if (input_[index] == '.') {
+      kind = FloatLiteral;
+    }
+  } while (isdigit(input_[index]) || input_[index] == '_' || input_[index] == '.');
+  return kind;
 }
 
 TokenKind Tokenizer::CharToken(TokenKind kind) {
@@ -171,31 +172,42 @@ Token Tokenizer::Advance() {
       case '*':
         kind = CharToken(Mul);
         break;
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
+      case '0'...'9':
         kind = Number();
         break;
       default:
         int d = static_cast<int>(input_[index]);
         std::cerr << "Unknown char '" << input_[index] << "' (utf-8 = " << d << ") at index " << index << std::endl;
-        std::unexpected();
+        std::exit(1);
     }
   }
   return Token {.kind = kind, .Length = index - old_index};
 }
 
+std::map<std::string, TokenKind> KeywordMap{
+  {"while", While},
+  {"as", As},
+  {"break", Break},
+  {"continue", Continue},
+  {"if", If},
+  {"else", Else},
+  {"true", True},
+  {"false", False},
+  {"func", Func},
+  {"for", For},
+  {"in", In},
+  {"switch", Switch},
+  {"const", Const},
+  {"return", Return}
+};
+
 std::list<Token> Tokenizer::Start() {
   std::list<Token> tokens;
   for (index = 0; index < input_.size(); ) {
     auto token = Advance();
+    if (token.kind == Ident && KeywordMap.find(input_.substr(index-token.Length, token.Length)) != KeywordMap.end()) {
+      token.kind = KeywordMap[input_.substr(index-token.Length, token.Length)];
+    }
     tokens.push_back(token);
   }
   return tokens;
